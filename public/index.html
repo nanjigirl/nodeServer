@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>文件上传</title>
+</head>
+<body>
+  <form action="http://localhost:3000/multer/upload" method="POST" enctype="multipart/form-data">
+    <label for="file">multer上传文件：</label>
+    <input type="file" name="file" id="file"><br />
+    <input type="submit" value="提交">
+  </form>
+  <form action="" method="POST" enctype="multipart/form-data">
+    <label for="file">split上传文件：</label>
+    <input type="file" name="file" id="btnFile"><br />
+    <input type="button" value="提交" onclick="upload(0)">
+  </form>
+  <script>
+    let btnFile = document.getElementById('#btnFile');
+    let chunkSize = 1024 * 1024;
+    function upload(index) {
+      let file = btnFile.file[0];
+      let {fname, fext} = file.name.split('.');
+
+      let start = index * chunkSize;
+      if (start > file.size) {
+        merge(file.name);
+        return;
+      }
+      let blob = file.slice(start, start + chunkSize);
+      let blobName = `${fname}.${index}.${fext}`;
+      let blobFile = new File([blob], blobName);
+
+      let formData = new FormData();
+      formData.append('file', blobFile);
+
+      axios.post('/split/upload', formData).then(res => {
+        console.log(res);
+        upload(++index);
+      })
+    }
+
+    function merge(name) {
+      axios.post('/split/merge', {name: name}).then(res => {
+        console.log(res);
+      })
+    }
+  </script>
+</body>
+</html>
