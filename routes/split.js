@@ -6,7 +6,7 @@ const fs = require('fs');
 
 var router = express.Router();
 
-const UPLOAD_DIR = path.resolve(__dirname, 'public/upload')
+const UPLOAD_DIR = path.resolve(__dirname, '../public/upload')
 /* multer简单文件上传 */
 router.post('/upload', async function (req, res, next) {
   const form = new multiparty.Form({uploadDir: 'temp'});
@@ -18,6 +18,7 @@ router.post('/upload', async function (req, res, next) {
     }
 
     const dPath = path.join(chunkDir, chunk.originalFilename.split('.')[1]);
+    console.log(chunk.path, dPath);
     await fse.move(chunk.path, dPath, {overwrite: true});
 
     res.send('上传成功');
@@ -35,11 +36,11 @@ router.post('/merge', async function(req, res) {
   chunks.sort((a, b) => a - b).map(chunkPath => {
     fs.appendFileSync(
       path.join(UPLOAD_DIR, name),
-      fs.readFileSync(`${chunkDir}${chunkPath}`)
+      fs.readFileSync(`${chunkDir}/${chunkPath}`)
     )
   })
   fse.removeSync(chunkDir);
-  res.send({msg: '合并成功', url: `http://localhost:3000/split/upload/${name}`});
+  res.send({msg: '合并成功', url: `http://localhost:3000/upload/${name}`});
 })
 
 module.exports = router;

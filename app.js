@@ -8,6 +8,7 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var multerRouter = require('./routes/multer');
 var splitRouter = require('./routes/split');
+var downloadRouter = require('./routes/download');
 
 var app = express();
 
@@ -25,6 +26,7 @@ app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/multer', multerRouter);
 app.use('/split', splitRouter);
+app.use('/download', downloadRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
